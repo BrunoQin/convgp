@@ -8,5 +8,5 @@ Y = np.vstack((np.argmax(mnist.train.labels, 1)[:, None],
                np.argmax(mnist.validation.labels, 1)[:, None]))
 Xt = mnist.test.images.astype(float)
 Yt = np.argmax(mnist.test.labels, 1)[:, None]
-
+## test
 print(X.shape)
