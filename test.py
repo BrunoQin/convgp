@@ -1,5 +1,36 @@
 import numpy as np
 from tensorflow.examples.tutorials.mnist import input_data
+from sklearn import preprocessing
+import gzip
+import pickle
+
+
+# read data
+with gzip.open('OCEAN_data/predict.pkl.gz') as fp:
+    predict = np.array(pickle.load(fp)).astype(float)
+
+with gzip.open('OCEAN_data/start.pkl.gz') as fp:
+    start = np.array(pickle.load(fp))
+
+# clean data
+start[start == -1.0E20] = 0
+# start = start[:, ~np.all(np.isnan(start), axis=0)]
+# start_ave = np.mean(start, axis=0)
+# start = start - start_ave
+
+predict[predict == -1.0E20] = 0
+# predict = predict[:, ~np.all(np.isnan(predict), axis=0)]
+# predict_ave = np.mean(predict, axis=0)
+# predict = predict - predict_ave
+
+nino = np.sum(predict - np.sum(predict, axis=0).reshape(1, predict.shape[1]) / predict.shape[0], axis=1)\
+           .reshape(predict.shape[0], 1) / predict.shape[1]
+
+start = preprocessing.scale(start)
+predict = preprocessing.scale(predict)
+
+print(nino[0:10])
+print(start[0:10])
 
 
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
@@ -8,5 +39,7 @@ Y = np.vstack((np.argmax(mnist.train.labels, 1)[:, None],
                np.argmax(mnist.validation.labels, 1)[:, None]))
 Xt = mnist.test.images.astype(float)
 Yt = np.argmax(mnist.test.labels, 1)[:, None]
-## test
-print(X.shape)
+
+print(X[0:10])
+print(Y[0:10])
+

@@ -5,6 +5,9 @@ import sys
 import jug
 import numpy as np
 import pandas as pd
+from sklearn import preprocessing
+import gzip
+import pickle
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 
@@ -41,6 +44,28 @@ def load_mnist():
                    np.argmax(mnist.validation.labels, 1)[:, None]))
     Xt = mnist.test.images.astype(float)
     Yt = np.argmax(mnist.test.labels, 1)[:, None]
+    return X, Y, Xt, Yt
+
+
+def load_ocean():
+    # read data
+    with gzip.open('OCEAN_data/predict.pkl.gz') as fp:
+        predict = np.array(pickle.load(fp)).astype(float)
+
+    with gzip.open('OCEAN_data/start.pkl.gz') as fp:
+        start = np.array(pickle.load(fp)).astype(float)
+
+    # clean data
+    start[start == -1.0E20] = 0
+    predict[predict == -1.0E20] = 0
+
+    nino = np.sum(predict - np.sum(predict, axis=0).reshape(1, predict.shape[1]) / predict.shape[0], axis=1)\
+               .reshape(predict.shape[0], 1) / predict.shape[1]
+    start = preprocessing.scale(start)
+    X = start[0:200]
+    Y = nino[0:200]
+    Xt = start[201:300]
+    Yt = nino[201:300]
     return X, Y, Xt, Yt
 
 
@@ -143,6 +168,12 @@ class MnistExperiment(ExperimentBase):
     def setup_dataset(self, verbose=False):
         with suppress_print():
             self.X, self.Y, self.Xt, self.Yt = load_mnist()
+
+
+class OceanExperiment(ExperimentBase):
+    def setup_dataset(self, verbose=False):
+        with suppress_print():
+            self.X, self.Y, self.Xt, self.Yt = load_ocean()
 
 
 class RectanglesImageExperiment(ExperimentBase):
