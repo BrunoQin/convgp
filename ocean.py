@@ -21,19 +21,19 @@ class OceanExperiment(exp_tools.OceanExperiment):
     def setup_model(self):
         Z = None
         if self.run_settings['kernel'] == "rbf":
-            k = GPflow.kernels.RBF(150 * 160)
+            k = GPflow.kernels.RBF(30 * 32)
             Z = self.X[np.random.permutation(len(self.X))[:self.M], :]
         elif self.run_settings['kernel'] == "poly":
-            k = GPflow.kernels.Polynomial(150 * 160, degree=9.0)
+            k = GPflow.kernels.Polynomial(30 * 32, degree=9.0)
             Z = self.X[np.random.permutation(len(self.X))[:self.M], :]
         elif self.run_settings['kernel'] == "rbfpoly":
-            k = (GPflow.kernels.Polynomial(150 * 160, degree=9.0) + GPflow.kernels.RBF(150 * 160) +
-                 GPflow.kernels.White(150 * 160, 1e-1))
+            k = (GPflow.kernels.Polynomial(30 * 32, degree=9.0) + GPflow.kernels.RBF(30 * 32) +
+                 GPflow.kernels.White(30 * 32, 1e-1))
             Z = self.X[np.random.permutation(len(self.X))[:self.M], :]
         elif self.run_settings["kernel"] == "conv":
-            k = ckern.ConvRBF([150, 160], [5, 5]) + GPflow.kernels.White(1, 1e-3)
+            k = ckern.ConvRBF([30, 32], [5, 5]) + GPflow.kernels.White(1, 1e-3)
         elif self.run_settings['kernel'] == "wconv":
-            k = ckern.WeightedConv(GPflow.kernels.RBF(25), [150, 160], [5, 5]) + GPflow.kernels.White(1, 1e-3)
+            k = ckern.WeightedConv(GPflow.kernels.RBF(25), [30, 32], [5, 5]) + GPflow.kernels.White(1, 1e-3)
         else:
             raise NotImplementedError
 
@@ -44,7 +44,7 @@ class OceanExperiment(exp_tools.OceanExperiment):
 
         k.fixed = self.run_settings.get('fixed', False)
 
-        self.m = GPflow.svgp.SVGP(self.X, self.Y, k, GPflow.likelihoods.MultiClass(10), Z.copy(), num_latent=10,
+        self.m = GPflow.svgp.SVGP(self.X, self.Y, k, GPflow.likelihoods.Gaussian(), Z.copy(), num_latent=10,
                                   minibatch_size=self.run_settings.get('minibatch_size', self.M))
         if self.run_settings["fix_w"]:
             self.m.kern.W.fixed = True

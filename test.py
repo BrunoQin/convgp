@@ -1,6 +1,7 @@
 import numpy as np
 from tensorflow.examples.tutorials.mnist import input_data
 from sklearn import preprocessing
+import scipy.ndimage
 import gzip
 import pickle
 
@@ -29,17 +30,35 @@ nino = np.sum(predict - np.sum(predict, axis=0).reshape(1, predict.shape[1]) / p
 start = preprocessing.scale(start)
 predict = preprocessing.scale(predict)
 
-print(nino[0:10])
-print(start[0:10])
+# print(nino[0:10])
+# print(start[0:10])
+
+start[0].reshape(150, 160)
+print(scipy.ndimage.zoom(start[0].reshape(150, 160), 0.2))
+print(scipy.ndimage.zoom(start[0].reshape(150, 160), 0.2).shape)
 
 
-mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
-X = np.vstack((mnist.train.images.astype(float), mnist.validation.images.astype('float')))
-Y = np.vstack((np.argmax(mnist.train.labels, 1)[:, None],
-               np.argmax(mnist.validation.labels, 1)[:, None]))
-Xt = mnist.test.images.astype(float)
-Yt = np.argmax(mnist.test.labels, 1)[:, None]
+X = None
+for i in start:
+    i.reshape(150, 160)
+    i = scipy.ndimage.zoom(i.reshape(150, 160), 0.2)
+    i = i.reshape(1, 960)
+    if X is None:
+        X = i
+    else:
+        X = np.vstack((X, i))
 
-print(X[0:10])
-print(Y[0:10])
+X = np.array(X)
+print(X.shape)
+
+
+# mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
+# X = np.vstack((mnist.train.images.astype(float), mnist.validation.images.astype('float')))
+# Y = np.vstack((np.argmax(mnist.train.labels, 1)[:, None],
+#                np.argmax(mnist.validation.labels, 1)[:, None]))
+# Xt = mnist.test.images.astype(float)
+# Yt = np.argmax(mnist.test.labels, 1)[:, None]
+#
+# print(X[0:10])
+# print(Y[0:10])
 
