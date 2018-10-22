@@ -1,5 +1,4 @@
 import numpy as np
-from tensorflow.examples.tutorials.mnist import input_data
 from sklearn import preprocessing
 import scipy.ndimage
 import gzip

@@ -4,6 +4,8 @@ Custom opt_tools tasks. Eventually, I think these can be merged into the main pa
 import time
 
 import numpy as np
+import gzip
+import pickle
 
 import opt_tools
 
@@ -36,6 +38,9 @@ class GPflowRegressionTracker(GPflowBenchmarkTrackerBase):
         rmse = np.mean((pY - self.test_Y) ** 2.0) ** 0.5
         nlpp = -np.mean(-0.5 * np.log(2 * np.pi * pYv) - 0.5 * (self.test_Y - pY) ** 2.0 / pYv)
         log_dict.update({'acc': rmse, 'nlpp': nlpp})
+
+        with gzip.open('results/result.pkl.gz', 'wb') as f:
+            f.write(pickle.dumps(pY))
 
         if self.verbose:
             print("Benchmarks took %.2fs. (rmse: %.4f, nlpp: %.4f)." % (time.time() - st, rmse, nlpp))
