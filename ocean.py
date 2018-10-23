@@ -44,8 +44,9 @@ class OceanExperiment(exp_tools.OceanExperiment):
 
         k.fixed = self.run_settings.get('fixed', False)
 
-        self.m = GPflow.svgp.SVGP(self.X, self.Y, k, GPflow.likelihoods.Gaussian(), Z.copy(), num_latent=10,
+        self.m = GPflow.svgp.SVGP(self.X, self.Y, k, GPflow.likelihoods.Gaussian(), Z.copy(),
                                   minibatch_size=self.run_settings.get('minibatch_size', self.M))
+
         if self.run_settings["fix_w"]:
             self.m.kern.W.fixed = True
 

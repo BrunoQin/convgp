@@ -60,9 +60,9 @@ def load_ocean():
     start[start == -1.0E20] = 0
     predict[predict == -1.0E20] = 0
 
-    nino = np.sum(predict - np.sum(predict, axis=0).reshape(1, predict.shape[1]) / predict.shape[0], axis=1)\
-               .reshape(predict.shape[0], 1) / predict.shape[1]
-    start = preprocessing.scale(start)
+    nino = np.sum(predict - np.sum(predict, axis=0).reshape(1, predict.shape[1]) / predict.shape[0], axis=1).\
+               reshape(predict.shape[0], 1) / predict.shape[1]
+    # start = preprocessing.scale(start)
     ALL = None
     for i in start:
         i.reshape(150, 160)
