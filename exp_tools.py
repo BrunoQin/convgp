@@ -53,7 +53,7 @@ def load_ocean():
     with gzip.open('OCEAN_data/redata.pkl.gz') as fp:
         redata = np.array(pickle.load(fp)).astype(float)
 
-    with gzip.open('OCEAN_data/index.pkl.gz') as fp:
+    with gzip.open('OCEAN_data/nino.pkl.gz') as fp:
         nino = np.array(pickle.load(fp)).astype(float)
 
     ALL = None
