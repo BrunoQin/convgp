@@ -40,3 +40,5 @@ with gzip.open('results/result.pkl.gz') as fp:
 
 print(pY)
 
+print(np.mean((pY - Yt) ** 2.0) ** 0.5)
+

@@ -27,7 +27,7 @@ class GPflowBenchmarkTrackerBase(opt_tools.tasks.GPflowLogOptimisation):
 
 class GPflowRegressionTracker(GPflowBenchmarkTrackerBase):
     def _get_columns(self, logger):
-        return super(GPflowRegressionTracker, self)._get_columns(logger) + ['acc', 'nlpp']
+        return super(GPflowRegressionTracker, self)._get_columns(logger) + ['rmse', 'nlpp', 'pred_time']
 
     def _get_record(self, logger, x, f=None):
         st = time.time()
@@ -37,7 +37,7 @@ class GPflowRegressionTracker(GPflowBenchmarkTrackerBase):
         pY, pYv = logger.model.predict_y(self.test_X)
         rmse = np.mean((pY - self.test_Y) ** 2.0) ** 0.5
         nlpp = -np.mean(-0.5 * np.log(2 * np.pi * pYv) - 0.5 * (self.test_Y - pY) ** 2.0 / pYv)
-        log_dict.update({'acc': rmse, 'nlpp': nlpp})
+        log_dict.update({'rmse': rmse, 'nlpp': nlpp, 'pred_time': time.time() - st})
 
         with gzip.open('results/result.pkl.gz', 'wb') as f:
             f.write(pickle.dumps(pY))

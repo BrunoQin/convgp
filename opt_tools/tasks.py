@@ -161,7 +161,8 @@ class GPflowLogOptimisation(LogOptimisation):
             # Get last record with parameters
             # params = self._old_hist.iloc[-1].filter(regex='(?!.*gpflow-opt*)model')
             params = self._old_hist.filter(regex='model*')
-            params = params[~self._old_hist.acc.isnull()]
+            # params = params[~self._old_hist.acc.isnull()]
+            params = params[~self._old_hist.rmse.isnull()]
 
             # logger.model.set_parameter_dict(params.filter(regex="model.*").iloc[-1])
             logger.model.set_parameter_dict(params.filter(regex='(?!.*gpflow-opt*)model').iloc[-1])
