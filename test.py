@@ -39,31 +39,33 @@ file_s.close()
 # re-build
 data = np.array(data)
 sst_ave = np.array(sst_ave)
-
+sst_ave[sst_ave == -1.0E20] = 0
 # prepare
-index = []
-redata = []
+index = None
+redata = None
 for i in range(len(data)):
     tem = data[i].reshape(200, 360)
     re = tem[20:170, 40:200]
-    re = re.reshape(1, 960)
-    redata.append(re)
+    re = re.reshape(1, 24000)
+    if redata is None:
+        redata = re
+    else:
+        redata = np.vstack((redata, re))
     nino = tem - sst_ave[i % 12]
     nino = nino[62:130, 129:189]
     nino = np.mean(nino)
-    index.append(nino)
-
-index = np.array(index)
-redata = np.array(redata)
-
+    if index is None:
+        index = nino
+    else:
+        index = np.vstack((index, nino))
 
 print(redata.shape)
 print(index.shape)
 with gzip.open('OCEAN_data/redata.pkl.gz', 'wb') as f:
     f.write(pickle.dumps(redata))
 
-with gzip.open('OCEAN_data/index.pkl.gz', 'wb') as f:
-    f.write(pickle.dumps(index))
+with gzip.open('OCEAN_data/nino.pkl.gz', 'wb') as f:
+    f.write(pickle.dumps(nino))
 
 # nino = np.sum(predict - np.sum(predict, axis=0).reshape(1, predict.shape[1]) / predict.shape[0], axis=1) \
 #            .reshape(predict.shape[0], 1) / predict.shape[1]
@@ -94,4 +96,3 @@ with gzip.open('OCEAN_data/index.pkl.gz', 'wb') as f:
 #
 # print(X[0:10])
 # print(Y[0:10])
-
