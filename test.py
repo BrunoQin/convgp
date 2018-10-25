@@ -54,6 +54,7 @@ for i in range(len(data)):
     nino = tem - sst_ave[i % 12]
     nino = nino[62:130, 129:189]
     nino = np.mean(nino)
+    print(nino)
     if index is None:
         index = nino
     else:
@@ -65,7 +66,7 @@ with gzip.open('OCEAN_data/redata.pkl.gz', 'wb') as f:
     f.write(pickle.dumps(redata))
 
 with gzip.open('OCEAN_data/nino.pkl.gz', 'wb') as f:
-    f.write(pickle.dumps(nino))
+    f.write(pickle.dumps(index))
 
 # nino = np.sum(predict - np.sum(predict, axis=0).reshape(1, predict.shape[1]) / predict.shape[0], axis=1) \
 #            .reshape(predict.shape[0], 1) / predict.shape[1]
