@@ -34,6 +34,8 @@ class OceanExperiment(exp_tools.OceanExperiment):
             k = ckern.ConvRBF([30, 32], [5, 5]) + GPflow.kernels.White(1, 1e-3)
         elif self.run_settings['kernel'] == "wconv":
             k = ckern.WeightedConv(GPflow.kernels.RBF(25), [30, 32], [5, 5]) + GPflow.kernels.White(1, 1e-3)
+        elif self.run_settings['kernel'] == "wconvrbf":
+            k = ckern.WeightedConvRBF([30, 32], [5, 5]) + GPflow.kernels.White(1, 1e-3)
         else:
             raise NotImplementedError
 
