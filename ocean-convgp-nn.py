@@ -3,11 +3,68 @@ import os
 
 import numpy as np
 import pandas as pd
-
+import gzip
 import GPflow
+import pickle
 import exp_tools
 import opt_tools
+import scipy.ndimage
+import tensorflow as tf
 import convgp.convkernels as ckern
+import gpflow as gpf
+
+
+def load_ocean():
+    # read data
+    with gzip.open('OCEAN_data/redata.pkl.gz') as fp:
+        redata = np.array(pickle.load(fp)).astype(float)
+
+    with gzip.open('OCEAN_data/nino.pkl.gz') as fp:
+        nino = np.array(pickle.load(fp)).astype(float)
+
+    ALL = None
+    for i in redata:
+        i.reshape(150, 160)
+        i = scipy.ndimage.zoom(i.reshape(150, 160), 0.2)
+        i = i.reshape(1, 960)
+        if ALL is None:
+            ALL = i
+        else:
+            ALL = np.vstack((ALL, i))
+    X = ALL[0:4600]
+    Y = nino[11:4611]
+    Xt = ALL[4601:4789]
+    Yt = nino[4612:4800]
+    return X, Y, Xt, Yt
+
+
+def main():
+
+    x_train, y_train, x_val, y_val, x_test, y_test = load_ocean()
+
+    tf_graph = tf.Graph()
+    tf_session = tf.Session(graph=tf_graph)
+
+    with gpf.defer_build():
+        kernel = ckern.ConvRBF([30, 32], [5, 5]) + GPflow.kernels.White(1, 1e-3)
+        Z = (kernel.kern_list[0].init_inducing(x_train, 100, method="patches-unique")
+             if type(kernel) is gpf.kernels.Add else
+             kernel.init_inducing(x_train, 100, method="patches-unique"))
+        gp_model = gpf.svgp.SVGP(x_train, y_train, kernel, GPflow.likelihoods.Gaussian(), Z.copy(), minibatch_size=100)
+
+    gp_model.compile(tf_session)
+
+    with tf_graph.as_default():
+        nn_base = tf.make_template("sconvnet_kernel", make_small_mnist_nn, end_h=num_h)  # end h is the number of hidden
+        # units at the end
+
+        h = nn_base(phs.x_image_reshaped)
+        h = tf.cast(h, gpf.settings.tf_float)
+
+        nn_vars = tf.global_variables()  # only nn variables exist up to now.
+    tf_session.run(tf.variables_initializer(nn_vars))
+
+
 
 
 class OceanExperiment(exp_tools.OceanExperiment):
